@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="VyaparSathi Merchant AI Lab — an interactive agent, safety, and vision demo."
+    />
+    <title>VyaparSathi · Merchant AI Lab</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body data-api-base="">
+    <a class="skip-link" href="#workspace">Skip to workspace</a>
+
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#" aria-label="VyaparSathi home">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>
+            <strong>VyaparSathi</strong>
+            <small>Merchant AI Lab</small>
+          </span>
+        </a>
+
+        <div class="topbar-actions">
+          <span class="sandbox-pill"><span class="pulse-dot"></span> Synthetic-data sandbox</span>
+          <button class="api-status" id="healthButton" type="button" aria-live="polite">
+            <span class="status-dot is-pending" id="healthDot"></span>
+            <span id="healthText">Checking API</span>
+          </button>
+        </div>
+      </header>
+
+      <main id="workspace">
+        <section class="hero" aria-labelledby="hero-title">
+          <div class="hero-copy">
+            <p class="eyebrow">Independent portfolio demo</p>
+            <h1 id="hero-title">Agentic operations, with the guardrails visible.</h1>
+            <p class="hero-description">
+              Explore a merchant-support agent, test prompt-injection defenses, and send a hand-drawn digit through a live model endpoint.
+            </p>
+          </div>
+          <div class="hero-signal" aria-label="Three components: agent, guardrail, vision model">
+            <span>Agent</span><b>→</b><span>Guardrail</span><b>→</b><span>Vision</span>
+          </div>
+        </section>
+
+        <section class="safety-banner" aria-label="Demo constraints">
+          <span class="shield-icon" aria-hidden="true">✦</span>
+          <p><strong>Built for review, not real payments.</strong> All merchants, events, and outcomes are synthetic; actions remain simulated and auditable.</p>
+        </section>
+
+        <div class="tab-list" role="tablist" aria-label="Merchant AI Lab tools">
+          <button class="tab is-active" id="merchant-tab" role="tab" type="button" aria-selected="true" aria-controls="merchant-panel">
+            <span class="tab-index">01</span>
+            <span><strong>VyaparSathi</strong><small>Merchant agent</small></span>
+          </button>
+          <button class="tab" id="sentinel-tab" role="tab" type="button" aria-selected="false" aria-controls="sentinel-panel">
+            <span class="tab-index">02</span>
+            <span><strong>AgentSentinel</strong><small>Prompt-injection lab</small></span>
+          </button>
+          <button class="tab" id="vision-tab" role="tab" type="button" aria-selected="false" aria-controls="vision-panel">
+            <span class="tab-index">03</span>
+            <span><strong>VisionBench</strong><small>Digit inference</small></span>
+          </button>
+        </div>
+
+        <section class="workspace-panel" id="merchant-panel" role="tabpanel" aria-labelledby="merchant-tab">
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Merchant operations copilot</p>
+              <h2>Ask the agent to investigate a case</h2>
+              <p>It plans a scoped workflow, calls only approved tools, then returns an evidence-backed answer and audit trace.</p>
+            </div>
+            <span class="endpoint-label">POST <code>/api/merchant/run</code></span>
+          </div>
+
+          <div class="merchant-layout">
+            <form class="control-card" id="merchantForm">
+              <div class="field-group">
+                <label for="merchantSelect">Merchant workspace</label>
+                <select id="merchantSelect" name="merchant_id">
+                  <option value="merchant_demo_01">merchant_demo_01 · Nisha Kirana Store</option>
+                  <option value="merchant_demo_02">merchant_demo_02 · Ravi Mobile Repairs</option>
+                </select>
+              </div>
+
+              <fieldset class="field-group task-group">
+                <legend>Choose a task</legend>
+                <div class="task-grid" id="taskChoices">
+                  <label class="task-choice is-selected">
+                    <input type="radio" name="task" value="Explain the settlement variance and propose the next safe step." checked />
+                    <span class="choice-icon">◎</span>
+                    <span><strong>Settlement check</strong><small>Reconcile recent activity</small></span>
+                  </label>
+                  <label class="task-choice">
+                    <input type="radio" name="task" value="Review the merchant onboarding record and identify any required human review." />
+                    <span class="choice-icon">◇</span>
+                    <span><strong>Onboarding review</strong><small>Assess documentation status</small></span>
+                  </label>
+                  <label class="task-choice">
+                    <input type="radio" name="task" value="Investigate unusual transaction activity and draft a cautious support response." />
+                    <span class="choice-icon">✦</span>
+                    <span><strong>Risk triage</strong><small>Surface anomalies safely</small></span>
+                  </label>
+                </div>
+              </fieldset>
+
+              <div class="field-group">
+                <label for="externalContext">Optional external context <span>untrusted by default</span></label>
+                <textarea id="externalContext" name="external_context" rows="4" placeholder="Paste a merchant note, a support message, or a reference number…"></textarea>
+              </div>
+
+              <div class="form-note"><span aria-hidden="true">⌁</span> Side-effecting actions require explicit confirmation in the backend policy layer.</div>
+              <button class="primary-button" id="runMerchantButton" type="submit"><span>Run agent workflow</span><b aria-hidden="true">→</b></button>
+            </form>
+
+            <div class="agent-output" aria-live="polite" aria-busy="false">
+              <div class="output-topline">
+                <div>
+                  <p class="eyebrow">Live execution</p>
+                  <h3>Agent trace</h3>
+                </div>
+                <span class="run-state" id="merchantRunState">Ready</span>
+              </div>
+
+              <ol class="trace-list" id="merchantTrace">
+                <li class="trace-step is-placeholder"><span>01</span><div><strong>Awaiting a task</strong><p>Run a scenario to inspect planning, tool use, and policy decisions.</p></div></li>
+              </ol>
+
+              <div class="response-card is-empty" id="merchantResponse">
+                <p class="response-label">Agent response</p>
+                <div class="empty-response">
+                  <span class="empty-orb" aria-hidden="true"></span>
+                  <p>Your structured answer and evidence will appear here.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="workspace-panel" id="sentinel-panel" role="tabpanel" aria-labelledby="sentinel-tab" hidden>
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Input and retrieval defense</p>
+              <h2>Test the prompt-injection gate</h2>
+              <p>Analyze a user message or retrieved note before it can influence tool selection or any simulated action.</p>
+            </div>
+            <span class="endpoint-label">POST <code>/api/guard/analyze</code></span>
+          </div>
+
+          <div class="sentinel-layout">
+            <form class="control-card sentinel-form" id="sentinelForm">
+              <div class="field-group">
+                <label for="guardInput">Content to inspect</label>
+                <textarea id="guardInput" name="text" rows="10" spellcheck="true">Please explain why the settlement arrived later than expected. Keep the response limited to the information in my case.</textarea>
+              </div>
+              <div class="example-row" aria-label="Load an example">
+                <span>Try a sample:</span>
+                <button type="button" class="text-button" data-guard-example="benign">Normal support request</button>
+                <button type="button" class="text-button" data-guard-example="injection">Injected document</button>
+              </div>
+              <button class="primary-button" id="runGuardButton" type="submit"><span>Analyze content</span><b aria-hidden="true">→</b></button>
+            </form>
+
+            <div class="sentinel-result" aria-live="polite" aria-busy="false">
+              <div class="risk-header">
+                <div>
+                  <p class="eyebrow">Guardrail assessment</p>
+                  <h3 id="guardTitle">Awaiting analysis</h3>
+                </div>
+                <div class="risk-orb risk-neutral" id="guardOrb"><span id="guardScore">—</span><small>risk</small></div>
+              </div>
+              <div class="risk-meter" aria-label="Prompt-injection risk"><span id="guardMeter"></span></div>
+              <div class="guard-verdict" id="guardVerdict">
+                <span class="verdict-icon" aria-hidden="true">⌁</span>
+                <p>Paste content and run the guard to see the backend’s policy decision, confidence, and reasons.</p>
+              </div>
+              <div class="reason-list" id="guardReasons"></div>
+              <details class="raw-details" id="guardRawDetails">
+                <summary>View structured response</summary>
+                <pre id="guardRaw">{}</pre>
+              </details>
+            </div>
+          </div>
+        </section>
+
+        <section class="workspace-panel" id="vision-panel" role="tabpanel" aria-labelledby="vision-tab" hidden>
+          <div class="panel-heading">
+            <div>
+              <p class="eyebrow">Lightweight deep-learning endpoint</p>
+              <h2>Draw a digit, inspect an inference</h2>
+              <p>Sketch a single digit on an 8 × 8 pixel canvas. The frontend sends a normalized pixel vector to the model API.</p>
+            </div>
+            <span class="endpoint-label">POST <code>/api/vision/predict</code></span>
+          </div>
+
+          <div class="vision-layout">
+            <div class="draw-card">
+              <div class="canvas-topline">
+                <div><p class="eyebrow">Input canvas</p><h3>8 × 8 pixels</h3></div>
+                <span class="canvas-hint">Draw with pointer or touch</span>
+              </div>
+              <canvas id="digitCanvas" width="280" height="280" aria-label="Digit drawing canvas. Draw a single numeral using a pointer or touch."></canvas>
+              <div class="canvas-actions">
+                <button class="secondary-button" id="loadExampleButton" type="button">Load an 8</button>
+                <button class="secondary-button" id="clearCanvasButton" type="button">Clear canvas</button>
+                <button class="primary-button" id="predictDigitButton" type="button"><span>Run prediction</span><b aria-hidden="true">→</b></button>
+              </div>
+            </div>
+
+            <div class="vision-result" aria-live="polite" aria-busy="false">
+              <div class="vision-label">Model output</div>
+              <div class="prediction-main">
+                <span class="prediction-value" id="predictionDigit">—</span>
+                <div><strong id="predictionLabel">No prediction yet</strong><p id="predictionConfidence">The normalized 64-value vector is ready when you are.</p></div>
+              </div>
+              <div class="probability-chart" id="probabilityChart" aria-label="Digit class probabilities">
+                <p class="chart-placeholder">Class probabilities will be drawn here after inference.</p>
+              </div>
+              <details class="raw-details" id="visionRawDetails">
+                <summary>View model response</summary>
+                <pre id="visionRaw">{}</pre>
+              </details>
+            </div>
+          </div>
+        </section>
+
+        <section class="system-strip" aria-label="System architecture summary">
+          <div><span class="system-number">01</span><p><strong>Plan</strong><small>Structured intent and scoped tool plan</small></p></div>
+          <div><span class="system-number">02</span><p><strong>Protect</strong><small>Input gate, provenance, approval policy</small></p></div>
+          <div><span class="system-number">03</span><p><strong>Prove</strong><small>Auditable trace and deterministic endpoint</small></p></div>
+        </section>
+      </main>
+
+      <footer>
+        <span>VyaparSathi Merchant AI Lab</span>
+        <span>Independent demo · No affiliation with any payment provider</span>
+      </footer>
+    </div>
+
+    <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+    <script src="app.js"></script>
+  </body>
+</html>
