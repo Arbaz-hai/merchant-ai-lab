@@ -340,3 +340,60 @@ footer { display: flex; justify-content: space-between; gap: 15px; padding: 21px
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* FraudShield and Merchant Growth decision records */
+.fraud-layout, .growth-layout { display: grid; grid-template-columns: minmax(290px, .9fr) minmax(0, 1.1fr); gap: 18px; align-items: stretch; }
+.investigation-output, .growth-output { display: flex; flex-direction: column; min-width: 0; padding: 21px; border: 1px solid var(--line); border-radius: var(--radius-lg); background: rgba(255,255,252,.68); }
+.risk-summary { display: flex; align-items: center; gap: 17px; margin: 19px 0; padding: 15px; border-radius: 14px; background: rgba(19,40,33,.045); }
+.risk-summary-copy { min-width: 0; }
+.risk-summary-copy .response-label { margin-bottom: 6px; }
+.risk-action { display: block; margin-bottom: 6px; color: var(--forest-deep); font-family: var(--font-mono); font-size: 17px; letter-spacing: -.02em; }
+.risk-summary-copy > p:last-child { margin: 0; color: var(--ink-soft); font-size: 12px; line-height: 1.5; }
+.risk-critical { color: #8d2924; background: #f7d5cf; }
+.decision-grid, .metrics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.decision-cell { min-width: 0; padding: 10px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,255,255,.48); }
+.decision-cell small { display: block; margin-bottom: 3px; color: var(--ink-faint); font-family: var(--font-mono); font-size: 9px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.decision-cell strong { display: block; overflow-wrap: anywhere; color: var(--ink); font-size: 12px; line-height: 1.35; }
+.evidence-section, .metrics-section, .recommendations-section { margin-top: 18px; }
+.evidence-list { display: grid; gap: 5px; }
+.evidence-item { display: grid; grid-template-columns: 25px 1fr; gap: 10px; align-items: flex-start; padding: 9px 0; border-bottom: 1px solid var(--line); }
+.evidence-item:last-child { border-bottom: 0; }
+.evidence-item p { margin: 1px 0 0; color: var(--ink-soft); font-size: 12px; line-height: 1.45; }
+.evidence-index, .recommendation-index { display: grid; place-items: center; width: 25px; height: 25px; border-radius: 7px; color: var(--forest); background: rgba(183,227,202,.42); font-family: var(--font-mono); font-size: 10px; font-weight: 800; }
+.output-waiting { margin: 20px 0; padding: 14px; border-radius: 12px; color: var(--ink-soft); background: rgba(19,40,33,.045); font-size: 13px; line-height: 1.55; }
+.is-error-copy { color: #9a3329; background: var(--red-soft); }
+.advice-rules { display: grid; gap: 8px; margin: 0 0 17px; }
+.advice-rules p { margin: 0; padding: 9px 10px; border-left: 2px solid var(--mint); color: var(--ink-soft); background: rgba(183,227,202,.16); font-size: 11px; line-height: 1.45; }
+.advice-rules strong { color: var(--forest); }
+.policy-static { cursor: default; }
+.policy-static:hover { transform: none; border-color: var(--line); }
+.growth-overview { margin: 18px 0 0; padding: 14px; border-radius: 12px; background: #f1f7ef; }
+.growth-overview .response-label { margin-bottom: 7px; }
+.growth-summary-copy { margin: 0; color: #24433a; font-size: 13px; line-height: 1.55; }
+.recommendations-list { display: grid; gap: 9px; }
+.recommendation-card { padding: 13px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.48); }
+.recommendation-topline { display: flex; align-items: center; gap: 9px; }
+.recommendation-topline > strong { flex: 1; min-width: 0; font-size: 13px; line-height: 1.3; }
+.recommendation-action { margin: 10px 0 12px; color: var(--ink-soft); font-size: 12px; line-height: 1.5; }
+.approval-chip { flex: 0 0 auto; padding: 3px 6px; border-radius: 999px; color: #466158; background: rgba(18,62,50,.08); font-size: 9px; font-weight: 700; white-space: nowrap; }
+.approval-chip.is-required { color: #86531f; background: rgba(243,200,108,.3); }
+.recommendation-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.recommendation-detail-grid .decision-cell { padding: 8px; background: rgba(19,40,33,.035); }
+.growth-footnotes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 17px; }
+.growth-footnote { min-width: 0; padding: 12px; border: 1px solid var(--line); border-radius: 11px; background: rgba(19,40,33,.035); }
+.growth-footnote .response-label { margin-bottom: 8px; }
+.compact-item { margin: 0 0 7px; color: var(--ink-soft); font-size: 11px; line-height: 1.45; }
+.compact-item:last-child { margin-bottom: 0; }
+.empty-copy { margin: 0; color: var(--ink-faint); font-size: 12px; line-height: 1.45; }
+
+@media (max-width: 880px) {
+  .fraud-layout, .growth-layout { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 680px) {
+  .investigation-output, .growth-output { padding: 16px; }
+  .risk-summary { align-items: flex-start; }
+  .decision-grid, .metrics-grid, .growth-footnotes { grid-template-columns: 1fr; }
+  .recommendation-topline { align-items: flex-start; }
+  .approval-chip { margin-left: auto; }
+}

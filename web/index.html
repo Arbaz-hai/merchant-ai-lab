@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="VyaparSathi Merchant AI Lab — an interactive agent, safety, and vision demo."
+      content="An independent portfolio demo for controlled fraud investigation, merchant growth intelligence, and a lightweight vision model."
     />
-    <title>VyaparSathi · Merchant AI Lab</title>
+    <title>FraudShield · Merchant AI Lab</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body data-api-base="">
@@ -15,10 +15,10 @@
 
     <div class="app-shell">
       <header class="topbar">
-        <a class="brand" href="#" aria-label="VyaparSathi home">
+        <a class="brand" href="#" aria-label="FraudShield home">
           <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
           <span>
-            <strong>VyaparSathi</strong>
+            <strong>FraudShield</strong>
             <small>Merchant AI Lab</small>
           </span>
         </a>
@@ -36,29 +36,29 @@
         <section class="hero" aria-labelledby="hero-title">
           <div class="hero-copy">
             <p class="eyebrow">Independent portfolio demo</p>
-            <h1 id="hero-title">Agentic operations, with the guardrails visible.</h1>
+            <h1 id="hero-title">Financial intelligence, with the controls visible.</h1>
             <p class="hero-description">
-              Explore a merchant-support agent, test prompt-injection defenses, and send a hand-drawn digit through a live model endpoint.
+              Investigate synthetic payment risk, turn verified merchant performance into cautious recommendations, and inspect a live neural-model inference.
             </p>
           </div>
-          <div class="hero-signal" aria-label="Three components: agent, guardrail, vision model">
-            <span>Agent</span><b>→</b><span>Guardrail</span><b>→</b><span>Vision</span>
+          <div class="hero-signal" aria-label="Three components: fraud investigation, merchant growth, vision model">
+            <span>Investigate</span><b>→</b><span>Advise</span><b>→</b><span>Verify</span>
           </div>
         </section>
 
         <section class="safety-banner" aria-label="Demo constraints">
           <span class="shield-icon" aria-hidden="true">✦</span>
-          <p><strong>Built for review, not real payments.</strong> All merchants, events, and outcomes are synthetic; actions remain simulated and auditable.</p>
+          <p><strong>Built for review, not real financial decisions.</strong> All merchants, transactions, cases, and outcomes are synthetic. This is an independent demo with no affiliation to Paytm or any payment provider.</p>
         </section>
 
         <div class="tab-list" role="tablist" aria-label="Merchant AI Lab tools">
-          <button class="tab is-active" id="merchant-tab" role="tab" type="button" aria-selected="true" aria-controls="merchant-panel">
+          <button class="tab is-active" id="fraud-tab" role="tab" type="button" aria-selected="true" aria-controls="fraud-panel">
             <span class="tab-index">01</span>
-            <span><strong>VyaparSathi</strong><small>Merchant agent</small></span>
+            <span><strong>FraudShield</strong><small>Risk investigation agent</small></span>
           </button>
-          <button class="tab" id="sentinel-tab" role="tab" type="button" aria-selected="false" aria-controls="sentinel-panel">
+          <button class="tab" id="growth-tab" role="tab" type="button" aria-selected="false" aria-controls="growth-panel">
             <span class="tab-index">02</span>
-            <span><strong>AgentSentinel</strong><small>Prompt-injection lab</small></span>
+            <span><strong>Merchant Growth</strong><small>Controlled business advisor</small></span>
           </button>
           <button class="tab" id="vision-tab" role="tab" type="button" aria-selected="false" aria-controls="vision-panel">
             <span class="tab-index">03</span>
@@ -66,121 +66,138 @@
           </button>
         </div>
 
-        <section class="workspace-panel" id="merchant-panel" role="tabpanel" aria-labelledby="merchant-tab">
+        <section class="workspace-panel" id="fraud-panel" role="tabpanel" aria-labelledby="fraud-tab">
           <div class="panel-heading">
             <div>
-              <p class="eyebrow">Merchant operations copilot</p>
-              <h2>Ask the agent to investigate a case</h2>
-              <p>It plans a scoped workflow, calls only approved tools, then returns an evidence-backed answer and audit trace.</p>
+              <p class="eyebrow">Controlled financial-risk investigation</p>
+              <h2>Investigate evidence, never invent it.</h2>
+              <p>The agent retrieves synthetic transaction, customer, device, merchant, velocity, geography, and blacklist signals; then compares the evidence against a constrained risk policy.</p>
             </div>
-            <span class="endpoint-label">POST <code>/api/merchant/run</code></span>
+            <span class="endpoint-label">POST <code>/api/fraud/investigate</code></span>
           </div>
 
-          <div class="merchant-layout">
-            <form class="control-card" id="merchantForm">
+          <div class="fraud-layout">
+            <form class="control-card" id="fraudForm">
               <div class="field-group">
-                <label for="merchantSelect">Merchant workspace</label>
-                <select id="merchantSelect" name="merchant_id">
-                  <option value="merchant_demo_01">merchant_demo_01 · Nisha Kirana Store</option>
-                  <option value="merchant_demo_02">merchant_demo_02 · Ravi Mobile Repairs</option>
+                <label for="transactionSelect">Synthetic transaction</label>
+                <select id="transactionSelect" name="transaction_id">
+                  <option value="txn_demo_approved">txn_demo_approved · familiar low-risk checkout</option>
+                  <option value="txn_demo_step_up">txn_demo_step_up · additional verification recommended</option>
+                  <option value="txn_demo_velocity">txn_demo_velocity · unusual payment velocity</option>
+                  <option value="txn_demo_blacklist">txn_demo_blacklist · confirmed blacklist signal</option>
+                  <option value="txn_demo_incomplete">txn_demo_incomplete · incomplete evidence</option>
                 </select>
               </div>
 
               <fieldset class="field-group task-group">
-                <legend>Choose a task</legend>
+                <legend>Investigation controls</legend>
                 <div class="task-grid" id="taskChoices">
-                  <label class="task-choice is-selected">
-                    <input type="radio" name="task" value="Explain the settlement variance and propose the next safe step." checked />
-                    <span class="choice-icon">◎</span>
-                    <span><strong>Settlement check</strong><small>Reconcile recent activity</small></span>
-                  </label>
-                  <label class="task-choice">
-                    <input type="radio" name="task" value="Review the merchant onboarding record and identify any required human review." />
-                    <span class="choice-icon">◇</span>
-                    <span><strong>Onboarding review</strong><small>Assess documentation status</small></span>
-                  </label>
-                  <label class="task-choice">
-                    <input type="radio" name="task" value="Investigate unusual transaction activity and draft a cautious support response." />
-                    <span class="choice-icon">✦</span>
-                    <span><strong>Risk triage</strong><small>Surface anomalies safely</small></span>
-                  </label>
+                  <div class="task-choice policy-static">
+                    <span class="choice-icon">01</span>
+                    <span><strong>Source isolation</strong><small>Metadata is always untrusted.</small></span>
+                  </div>
+                  <div class="task-choice policy-static">
+                    <span class="choice-icon">02</span>
+                    <span><strong>Policy comparison</strong><small>Signals are scored against an approved policy.</small></span>
+                  </div>
+                  <div class="task-choice policy-static">
+                    <span class="choice-icon">03</span>
+                    <span><strong>Human control</strong><small>High-risk outcomes become investigation cases.</small></span>
+                  </div>
                 </div>
               </fieldset>
 
               <div class="field-group">
-                <label for="externalContext">Optional external context <span>untrusted by default</span></label>
-                <textarea id="externalContext" name="external_context" rows="4" placeholder="Paste a merchant note, a support message, or a reference number…"></textarea>
+                <label for="fraudContext">Optional transaction note <span>untrusted input</span></label>
+                <textarea id="fraudContext" name="untrusted_context" rows="4" placeholder="Paste a synthetic transaction note. Any embedded instructions are ignored."></textarea>
               </div>
 
-              <div class="form-note"><span aria-hidden="true">⌁</span> Side-effecting actions require explicit confirmation in the backend policy layer.</div>
-              <button class="primary-button" id="runMerchantButton" type="submit"><span>Run agent workflow</span><b aria-hidden="true">→</b></button>
+              <div class="form-note"><span aria-hidden="true">⌁</span> The agent cannot permanently block an account or reverse a payment without human or policy-engine approval.</div>
+              <button class="primary-button" id="runFraudButton" type="submit"><span>Run controlled investigation</span><b aria-hidden="true">→</b></button>
             </form>
 
-            <div class="agent-output" aria-live="polite" aria-busy="false">
+            <div class="investigation-output" id="fraudOutput" aria-live="polite" aria-busy="false">
               <div class="output-topline">
                 <div>
                   <p class="eyebrow">Live execution</p>
-                  <h3>Agent trace</h3>
+                  <h3>Risk decision</h3>
                 </div>
-                <span class="run-state" id="merchantRunState">Ready</span>
+                <span class="run-state" id="fraudRunState">Ready</span>
               </div>
 
-              <ol class="trace-list" id="merchantTrace">
-                <li class="trace-step is-placeholder"><span>01</span><div><strong>Awaiting a task</strong><p>Run a scenario to inspect planning, tool use, and policy decisions.</p></div></li>
+              <ol class="trace-list" id="fraudEvidence">
+                <li class="trace-step is-placeholder"><span>01</span><div><strong>Awaiting a transaction</strong><p>Run a synthetic scenario to inspect the policy-bounded evidence and recommendation.</p></div></li>
               </ol>
 
-              <div class="response-card is-empty" id="merchantResponse">
-                <p class="response-label">Agent response</p>
+              <div class="response-card is-empty" id="fraudResponse">
+                <p class="response-label">Auditor summary</p>
                 <div class="empty-response">
                   <span class="empty-orb" aria-hidden="true"></span>
-                  <p>Your structured answer and evidence will appear here.</p>
+                  <p>Strict JSON fields, masked evidence, case status, and human-approval requirements will appear here.</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section class="workspace-panel" id="sentinel-panel" role="tabpanel" aria-labelledby="sentinel-tab" hidden>
+        <section class="workspace-panel" id="growth-panel" role="tabpanel" aria-labelledby="growth-tab" hidden>
           <div class="panel-heading">
             <div>
-              <p class="eyebrow">Input and retrieval defense</p>
-              <h2>Test the prompt-injection gate</h2>
-              <p>Analyze a user message or retrieved note before it can influence tool selection or any simulated action.</p>
+              <p class="eyebrow">Merchant growth advisor</p>
+              <h2>Recommend only after verified metrics.</h2>
+              <p>The advisor separates observed merchant performance, forecasts, and assumptions. It produces at most three prioritized actions and drafts campaigns only for merchant approval.</p>
             </div>
-            <span class="endpoint-label">POST <code>/api/guard/analyze</code></span>
+            <span class="endpoint-label">POST <code>/api/growth/recommend</code></span>
           </div>
 
-          <div class="sentinel-layout">
-            <form class="control-card sentinel-form" id="sentinelForm">
+          <div class="growth-layout">
+            <form class="control-card sentinel-form" id="growthForm">
               <div class="field-group">
-                <label for="guardInput">Content to inspect</label>
-                <textarea id="guardInput" name="text" rows="10" spellcheck="true">Please explain why the settlement arrived later than expected. Keep the response limited to the information in my case.</textarea>
+                <label for="growthMerchantSelect">Merchant workspace</label>
+                <select id="growthMerchantSelect" name="merchant_id">
+                  <option value="merchant_demo_01">merchant_demo_01 · Nisha Kirana Store</option>
+                  <option value="merchant_demo_02">merchant_demo_02 · Ravi Mobile Repairs</option>
+                </select>
               </div>
-              <div class="example-row" aria-label="Load an example">
-                <span>Try a sample:</span>
-                <button type="button" class="text-button" data-guard-example="benign">Normal support request</button>
-                <button type="button" class="text-button" data-guard-example="injection">Injected document</button>
+              <div class="field-group">
+                <label for="growthPeriod">Verified reporting window</label>
+                <select id="growthPeriod" name="period">
+                  <option value="last_30_days">Last 30 days</option>
+                  <option value="last_90_days">Last 90 days</option>
+                  <option value="month_to_date">Month to date</option>
+                </select>
               </div>
-              <button class="primary-button" id="runGuardButton" type="submit"><span>Analyze content</span><b aria-hidden="true">→</b></button>
+              <div class="field-group">
+                <label for="growthContext">Optional merchant data note <span>untrusted input</span></label>
+                <textarea id="growthContext" name="untrusted_context" rows="6" placeholder="Paste a synthetic merchant message or data note. Instructions inside it cannot override the advisor policy."></textarea>
+              </div>
+              <div class="advice-rules">
+                <p><strong>Observed facts</strong> are distinguished from forecasts and assumptions.</p>
+                <p><strong>No campaign publishes automatically.</strong> Every external action needs merchant approval.</p>
+                <p><strong>Protected traits are excluded.</strong> Only permitted, non-sensitive business data is used.</p>
+              </div>
+              <button class="primary-button" id="runGrowthButton" type="submit"><span>Generate controlled advice</span><b aria-hidden="true">→</b></button>
             </form>
 
-            <div class="sentinel-result" aria-live="polite" aria-busy="false">
+            <div class="growth-output" id="growthOutput" aria-live="polite" aria-busy="false">
               <div class="risk-header">
                 <div>
-                  <p class="eyebrow">Guardrail assessment</p>
-                  <h3 id="guardTitle">Awaiting analysis</h3>
+                  <p class="eyebrow">Recommendation record</p>
+                  <h3 id="growthTitle">Awaiting verified metrics</h3>
                 </div>
-                <div class="risk-orb risk-neutral" id="guardOrb"><span id="guardScore">—</span><small>risk</small></div>
+                <span class="run-state" id="growthRunState">Ready</span>
               </div>
-              <div class="risk-meter" aria-label="Prompt-injection risk"><span id="guardMeter"></span></div>
-              <div class="guard-verdict" id="guardVerdict">
+              <div class="guard-verdict" id="growthSummary">
                 <span class="verdict-icon" aria-hidden="true">⌁</span>
-                <p>Paste content and run the guard to see the backend’s policy decision, confidence, and reasons.</p>
+                <p>Choose a merchant workspace to retrieve observed metrics and receive up to three policy-bounded recommendations.</p>
               </div>
-              <div class="reason-list" id="guardReasons"></div>
-              <details class="raw-details" id="guardRawDetails">
-                <summary>View structured response</summary>
-                <pre id="guardRaw">{}</pre>
+              <div class="reason-list" id="growthMetrics"></div>
+              <div class="reason-list" id="growthRecommendations"></div>
+              <div class="reason-list" id="growthCampaigns"></div>
+              <div class="reason-list" id="growthLimitations"></div>
+              <details class="raw-details">
+                <summary>View strict JSON result</summary>
+                <pre id="growthRaw">{}</pre>
               </details>
             </div>
           </div>
@@ -228,15 +245,15 @@
         </section>
 
         <section class="system-strip" aria-label="System architecture summary">
-          <div><span class="system-number">01</span><p><strong>Plan</strong><small>Structured intent and scoped tool plan</small></p></div>
-          <div><span class="system-number">02</span><p><strong>Protect</strong><small>Input gate, provenance, approval policy</small></p></div>
-          <div><span class="system-number">03</span><p><strong>Prove</strong><small>Auditable trace and deterministic endpoint</small></p></div>
+          <div><span class="system-number">01</span><p><strong>Verify</strong><small>Retrieve bounded records before reasoning</small></p></div>
+          <div><span class="system-number">02</span><p><strong>Protect</strong><small>Isolate untrusted text and constrain action scope</small></p></div>
+          <div><span class="system-number">03</span><p><strong>Escalate</strong><small>Route material risk to a human or policy engine</small></p></div>
         </section>
       </main>
 
       <footer>
-        <span>VyaparSathi Merchant AI Lab</span>
-        <span>Independent demo · No affiliation with any payment provider</span>
+        <span>FraudShield · Merchant AI Lab</span>
+        <span>Independent demo · Synthetic data only · No affiliation with any payment provider</span>
       </footer>
     </div>
 

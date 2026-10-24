@@ -1,7 +1,8 @@
-"""A dependency-light public demo for safe merchant operations agents.
+"""A dependency-light public demo for controlled financial-risk AI agents.
 
-The app deliberately uses synthetic payment data and deterministic tool routing so it
-can be deployed without secrets, paid model APIs, or access to real payment systems.
+All records below are synthetic. The app never connects to payment rails, customer
+accounts, or production fraud systems; it makes trust boundaries, policy checks, and
+human approvals visible for portfolio review.
 """
 
 from __future__ import annotations
@@ -10,7 +11,6 @@ import json
 import os
 import re
 import threading
-import uuid
 from datetime import datetime, timezone
 from http import HTTPStatus
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -24,33 +24,95 @@ WEB_ROOT = ROOT / "web"
 AUDIT_PATH = ROOT / "data" / "audit.jsonl"
 MAX_BODY_BYTES = 100_000
 
-MERCHANTS = {
-    "merchant_demo_01": {
-        "name": "Nisha Kirana Store",
-        "city": "Noida",
-        "language": "English / Hindi",
-        "today_transactions": 186,
-        "today_gmv": 42860,
-        "success_rate": 98.4,
-        "refunds_pending": 2,
-        "settlement_eta": "Today, 18:30 IST",
+FRAUD_TRANSACTIONS = {
+    "txn_demo_approved": {
+        "amount_inr": 1240,
+        "payment_method": "UPI",
+        "merchant_category": "grocery",
+        "customer_activity": {"account_age_days": 490, "transactions_24h": 2, "failed_auth_24h": 0},
+        "device_activity": {"known_device": True, "device_changes_30d": 0},
+        "merchant_risk": {"risk_band": "LOW", "chargeback_rate_pct": 0.12},
+        "signals": {"blacklisted": False, "velocity": False, "geography": False, "device": False, "amount": False, "behavior": False},
+        "features_complete": True,
     },
-    "merchant_demo_02": {
-        "name": "Ravi Mobile Repairs",
-        "city": "Delhi",
-        "language": "Hindi / English",
-        "today_transactions": 74,
-        "today_gmv": 19640,
-        "success_rate": 97.1,
-        "refunds_pending": 1,
-        "settlement_eta": "Tomorrow, 10:00 IST",
+    "txn_demo_step_up": {
+        "amount_inr": 4820,
+        "payment_method": "card",
+        "merchant_category": "electronics",
+        "customer_activity": {"account_age_days": 61, "transactions_24h": 3, "failed_auth_24h": 1},
+        "device_activity": {"known_device": True, "device_changes_30d": 1},
+        "merchant_risk": {"risk_band": "MEDIUM", "chargeback_rate_pct": 0.54},
+        "signals": {"blacklisted": False, "velocity": False, "geography": True, "device": False, "amount": True, "behavior": False},
+        "features_complete": True,
+    },
+    "txn_demo_velocity": {
+        "amount_inr": 18800,
+        "payment_method": "card",
+        "merchant_category": "digital_goods",
+        "customer_activity": {"account_age_days": 16, "transactions_24h": 9, "failed_auth_24h": 3},
+        "device_activity": {"known_device": False, "device_changes_30d": 3},
+        "merchant_risk": {"risk_band": "HIGH", "chargeback_rate_pct": 1.68},
+        "signals": {"blacklisted": False, "velocity": True, "geography": True, "device": True, "amount": True, "behavior": True},
+        "features_complete": True,
+    },
+    "txn_demo_blacklist": {
+        "amount_inr": 39750,
+        "payment_method": "card",
+        "merchant_category": "high_value_resale",
+        "customer_activity": {"account_age_days": 2, "transactions_24h": 14, "failed_auth_24h": 7},
+        "device_activity": {"known_device": False, "device_changes_30d": 5},
+        "merchant_risk": {"risk_band": "HIGH", "chargeback_rate_pct": 2.31},
+        "signals": {"blacklisted": True, "velocity": True, "geography": True, "device": True, "amount": True, "behavior": True},
+        "features_complete": True,
+    },
+    "txn_demo_incomplete": {
+        "amount_inr": 7200,
+        "payment_method": "UPI",
+        "merchant_category": "unknown",
+        "customer_activity": {"account_age_days": None, "transactions_24h": None, "failed_auth_24h": None},
+        "device_activity": {"known_device": None, "device_changes_30d": None},
+        "merchant_risk": {"risk_band": "UNKNOWN", "chargeback_rate_pct": None},
+        "signals": {},
+        "features_complete": False,
     },
 }
 
-POLICIES = {
-    "refund": "Refunds above INR 5,000 or any request using unverified beneficiary details require human approval.",
-    "settlement": "The agent may explain a settlement status but must not alter settlement instructions.",
-    "onboarding": "The agent may prepare an onboarding checklist; merchant identity and bank details need human verification.",
+MERCHANT_GROWTH_DATA = {
+    "merchant_demo_01": {
+        "period": "Last 30 synthetic days",
+        "metrics": {
+            "revenue_inr": 648000,
+            "transaction_count": 4680,
+            "average_order_value_inr": 138.5,
+            "refund_rate_pct": 0.7,
+            "repeat_customer_rate_pct": 31.0,
+            "settlement_timing": "T+1; 98.6% on schedule",
+            "payment_method_mix_pct": {"upi": 63, "cards": 22, "wallets": 15},
+            "revenue_change_pct": 9.4,
+            "transaction_change_pct": 7.7,
+        },
+        "history_complete": True,
+    },
+    "merchant_demo_02": {
+        "period": "Last 30 synthetic days",
+        "metrics": {
+            "revenue_inr": 324000,
+            "transaction_count": 1720,
+            "average_order_value_inr": 188.4,
+            "refund_rate_pct": 2.1,
+            "repeat_customer_rate_pct": 19.0,
+            "settlement_timing": "T+1; 95.8% on schedule",
+            "payment_method_mix_pct": {"upi": 51, "cards": 37, "wallets": 12},
+            "revenue_change_pct": -3.2,
+            "transaction_change_pct": -5.1,
+        },
+        "history_complete": True,
+    },
+    "merchant_demo_incomplete": {
+        "period": "Last 30 synthetic days",
+        "metrics": {"revenue_inr": 114000, "transaction_count": None, "average_order_value_inr": None},
+        "history_complete": False,
+    },
 }
 
 PROMPT_INJECTION_RULES = [
@@ -80,9 +142,6 @@ PROMPT_INJECTION_RULES = [
         35,
     ),
 ]
-
-HIGH_RISK_ACTIONS = ("refund", "transfer", "payout", "payment", "settlement", "delete", "bank detail")
-
 
 def now_iso() -> str:
     return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
@@ -138,24 +197,6 @@ def analyze_prompt_injection(text: str) -> dict[str, Any]:
     }
 
 
-def _intent_for(task: str) -> str:
-    task = task.lower()
-    if any(token in task for token in ("refund", "return money", "money back")):
-        return "refund"
-    if any(token in task for token in ("settlement", "payout", "credit when")):
-        return "settlement"
-    if any(token in task for token in ("onboard", "kyc", "activate", "profile")):
-        return "onboarding"
-    if any(token in task for token in ("summary", "sales", "transaction", "payment", "today", "aaj", "report")):
-        return "summary"
-    return "help"
-
-
-def _human_approval_needed(task: str) -> bool:
-    task = task.lower()
-    return any(action in task for action in HIGH_RISK_ACTIONS)
-
-
 def append_audit(event: dict[str, Any]) -> None:
     """Write a minimal synthetic trace for the demo without storing raw source text."""
     AUDIT_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -163,90 +204,239 @@ def append_audit(event: dict[str, Any]) -> None:
         stream.write(json.dumps(event, ensure_ascii=False) + "\n")
 
 
-def run_merchant_agent(payload: dict[str, Any]) -> dict[str, Any]:
-    merchant_id = clamp_text(payload.get("merchant_id")) or "merchant_demo_01"
-    merchant = MERCHANTS.get(merchant_id, MERCHANTS["merchant_demo_01"])
-    task = clamp_text(payload.get("task"), 2_000)
-    external_context = clamp_text(payload.get("external_context"), 30_000)
-    if not task:
-        raise ValueError("Please describe a merchant operations task.")
+def _masked_reference(value: str) -> str:
+    """Keep a stable audit reference without persisting a raw identifier."""
+    return f"{value[:4]}_•••{value[-3:]}" if len(value) > 7 else "redacted"
 
-    audit_id = f"audit_{uuid.uuid4().hex[:10]}"
-    guard = analyze_prompt_injection(external_context)
-    trace = [
-        {"step": "Trust boundary", "detail": "Separated user task from untrusted external context."},
-        {"step": "Input guard", "detail": f"{guard['decision'].title()} | risk {guard['risk_score']}/100"},
+
+def _untrusted_input_guard(payload: dict[str, Any]) -> dict[str, Any]:
+    """Free text and metadata are always data, never instructions."""
+    untrusted_context = clamp_text(
+        payload.get("untrusted_context") or payload.get("external_context"), 30_000
+    )
+    metadata = clamp_text(payload.get("transaction_metadata") or payload.get("merchant_data"), 30_000)
+    return analyze_prompt_injection("\n".join(part for part in (untrusted_context, metadata) if part))
+
+
+def _ml_risk_model(record: dict[str, Any]) -> tuple[int, float]:
+    """Run a fixed-weight, reproducible model surrogate on verified synthetic features.
+
+    It intentionally does not train on customer data. Fixed coefficients make this
+    portfolio demo inspectable while preserving the ML-model control point.
+    """
+    signals = record["signals"]
+    activity = record["customer_activity"]
+    merchant = record["merchant_risk"]
+    score = 6
+    score += 72 if signals["blacklisted"] else 0
+    score += 22 if signals["velocity"] else 0
+    score += 12 if signals["geography"] else 0
+    score += 12 if signals["device"] else 0
+    score += 9 if signals["amount"] else 0
+    score += 6 if signals["behavior"] else 0
+    score += {"LOW": 0, "MEDIUM": 5, "HIGH": 8}.get(merchant["risk_band"], 0)
+    score += 7 if int(activity["failed_auth_24h"]) >= 3 else 0
+    score = min(99, score)
+    confidence = 0.95 if score >= 60 else 0.91 if score <= 30 else 0.86
+    return score, confidence
+
+
+def _risk_decision(score: int) -> tuple[str, str, bool, bool]:
+    if score >= 85:
+        return "CRITICAL", "ESCALATE", True, True
+    if score >= 60:
+        return "HIGH", "HOLD", True, True
+    if score >= 30:
+        return "MEDIUM", "STEP_UP", False, False
+    return "LOW", "ALLOW", False, False
+
+
+def _fraud_evidence(record: dict[str, Any], model_score: int, quarantined: bool) -> list[str]:
+    signals = record["signals"]
+    activity = record["customer_activity"]
+    merchant = record["merchant_risk"]
+    evidence = [
+        f"Verified synthetic transaction amount: INR {record['amount_inr']:,}; payment method: {record['payment_method'].upper()}.",
+        "Blacklist check: MATCH" if signals["blacklisted"] else "Blacklist check: no match.",
+        "Velocity signal: elevated" if signals["velocity"] else "Velocity signal: within approved threshold.",
+        "Geography signal: mismatch observed" if signals["geography"] else "Geography signal: consistent with baseline.",
+        "Device signal: unfamiliar device" if signals["device"] else "Device signal: recognized or stable.",
+        "Amount signal: anomalous" if signals["amount"] else "Amount signal: within expected range.",
+        "Behavioral signal: anomalous" if signals["behavior"] else "Behavioral signal: no anomaly observed.",
+        f"Merchant risk band: {merchant['risk_band']}; synthetic chargeback baseline: {merchant['chargeback_rate_pct']}%.",
+        f"ML risk-model score: {model_score}/100 using verified synthetic features.",
     ]
+    if int(activity["failed_auth_24h"]) > 0:
+        evidence.append(f"Recent failed-authentication count: {activity['failed_auth_24h']} (synthetic aggregate).")
+    if quarantined:
+        evidence.append("Untrusted external text was quarantined and did not modify the decision.")
+    return evidence
 
-    if guard["decision"] == "block":
+
+def investigate_fraud(payload: dict[str, Any]) -> dict[str, Any]:
+    """Return the strict FraudShield contract using only verified synthetic records."""
+    transaction_id = clamp_text(payload.get("transaction_id"), 120)
+    if transaction_id not in FRAUD_TRANSACTIONS:
+        return {
+            "transaction_id": transaction_id or "unknown",
+            "risk_score": 65,
+            "risk_level": "HIGH",
+            "recommended_action": "ESCALATE",
+            "evidence": ["INSUFFICIENT_EVIDENCE: no verified synthetic transaction record was available."],
+            "reasoning_summary": "INSUFFICIENT_EVIDENCE: the requested record was not found. Escalated without creating or inferring transaction details.",
+            "confidence": 0.0,
+            "case_created": True,
+            "human_approval_required": True,
+        }
+
+    record = FRAUD_TRANSACTIONS[transaction_id]
+    guard = _untrusted_input_guard(payload)
+    quarantined = guard["decision"] in {"block", "review"}
+    if not record["features_complete"]:
         result = {
-            "audit_id": audit_id,
-            "status": "blocked",
-            "message": "The external context was quarantined before any merchant tool could run.",
-            "guard": guard,
-            "tools_used": [],
-            "trace": trace + [{"step": "Safe fallback", "detail": "Returned a concise block decision; no action was attempted."}],
+            "transaction_id": transaction_id,
+            "risk_score": 65,
+            "risk_level": "HIGH",
+            "recommended_action": "ESCALATE",
+            "evidence": [
+                "INSUFFICIENT_EVIDENCE: customer, device, or merchant-risk features are incomplete.",
+                "No ML risk score was generated because verified feature data is incomplete.",
+            ] + (["Untrusted external text was quarantined and did not modify the decision."] if quarantined else []),
+            "reasoning_summary": "INSUFFICIENT_EVIDENCE: policy requires escalation when evidence is incomplete; no permanent block or reversal was attempted.",
+            "confidence": 0.0,
+            "case_created": True,
+            "human_approval_required": True,
         }
-        append_audit({"at": now_iso(), "audit_id": audit_id, "intent": "blocked", "status": "blocked", "risk": guard["risk_score"]})
-        return result
-
-    intent = _intent_for(task)
-    trace.append({"step": "Plan", "detail": f"Classified intent as {intent}; selected least-privilege read tools."})
-    tool_output: dict[str, Any]
-    tools_used: list[str]
-    if intent == "summary":
-        tools_used = ["merchant_profile.read", "payment_summary.read"]
-        tool_output = {
-            "merchant": merchant["name"],
-            "location": merchant["city"],
-            "transactions_today": merchant["today_transactions"],
-            "gmv_today_inr": merchant["today_gmv"],
-            "payment_success_rate": f"{merchant['success_rate']}%",
-            "pending_refunds": merchant["refunds_pending"],
-        }
-        status = "completed"
-        message = "Prepared a read-only merchant summary from synthetic demo data."
-    elif intent == "settlement":
-        tools_used = ["merchant_profile.read", "settlement_status.read"]
-        tool_output = {"merchant": merchant["name"], "next_settlement": merchant["settlement_eta"], "policy": POLICIES["settlement"]}
-        status = "completed"
-        message = "Retrieved settlement status; no settlement instruction can be changed by this demo agent."
-    elif intent == "onboarding":
-        tools_used = ["onboarding_checklist.read"]
-        tool_output = {
-            "checklist": ["Verify merchant identity", "Validate bank account through an approved workflow", "Confirm business category", "Obtain human approval before activation"],
-            "policy": POLICIES["onboarding"],
-        }
-        status = "completed"
-        message = "Prepared a read-only onboarding checklist."
-    elif intent == "refund":
-        tools_used = ["merchant_profile.read", "refund_policy.read"]
-        tool_output = {"policy": POLICIES["refund"], "proposed_action": "A human approver must validate the refund before execution."}
-        status = "requires_human_approval"
-        message = "The agent created a refund plan but intentionally cannot issue a refund."
     else:
-        tools_used = ["capability_catalog.read"]
-        tool_output = {
-            "supported_tasks": ["today's payment summary", "settlement status", "merchant onboarding checklist", "refund policy guidance"],
-            "safety_note": "This public demo has no access to real payments, accounts, or customer data.",
+        score, confidence = _ml_risk_model(record)
+        level, action, case_created, human_approval = _risk_decision(score)
+        result = {
+            "transaction_id": transaction_id,
+            "risk_score": score,
+            "risk_level": level,
+            "recommended_action": action,
+            "evidence": _fraud_evidence(record, score, quarantined),
+            "reasoning_summary": (
+                f"Verified synthetic transaction, customer/device aggregate, merchant-risk, and model evidence align to {level} policy. "
+                "Any irreversible payment or account action requires an authorized human or policy engine."
+            ),
+            "confidence": confidence,
+            "case_created": case_created,
+            "human_approval_required": human_approval,
         }
-        status = "completed"
-        message = "Explained the demo agent's safe, read-only capabilities."
+    append_audit(
+        {
+            "at": now_iso(),
+            "event": "fraud_investigation",
+            "transaction_ref": _masked_reference(transaction_id),
+            "risk_level": result["risk_level"],
+            "recommended_action": result["recommended_action"],
+            "case_created": result["case_created"],
+        }
+    )
+    return result
 
-    if _human_approval_needed(task) and status == "completed":
-        trace.append({"step": "Human-in-the-loop", "detail": "Task wording requests an external effect; retained read-only mode."})
-    trace.append({"step": "Tool results", "detail": ", ".join(tools_used)})
-    trace.append({"step": "Response", "detail": "Produced a grounded answer with an auditable trace."})
-    result = {
-        "audit_id": audit_id,
-        "status": status,
-        "message": message,
-        "guard": guard,
-        "tools_used": tools_used,
-        "tool_output": tool_output,
-        "trace": trace,
-    }
-    append_audit({"at": now_iso(), "audit_id": audit_id, "intent": intent, "status": status, "risk": guard["risk_score"], "tools": tools_used})
+
+def _growth_recommendations(metrics: dict[str, Any]) -> list[dict[str, Any]]:
+    recommendations: list[dict[str, Any]] = []
+    if metrics["repeat_customer_rate_pct"] < 35:
+        recommendations.append(
+            {
+                "title": "Draft an opt-in returning-customer reminder",
+                "action": "Prepare a consent-based reorder reminder for merchant review; do not publish automatically.",
+                "expected_impact": "Potential 2-4 percentage-point repeat-customer lift; not guaranteed.",
+                "estimated_cost": "Low: merchant-approved campaign setup and offer funding.",
+                "risk": "Medium: validate consent, targeting rules, and offer margin before publication.",
+                "confidence": 0.72,
+                "requires_approval": True,
+            }
+        )
+    if metrics["refund_rate_pct"] > 1.0:
+        recommendations.append(
+            {
+                "title": "Investigate top refund drivers",
+                "action": "Review merchant-provided order and fulfilment aggregates before changing operations.",
+                "expected_impact": "Could reduce avoidable refund rate; the effect depends on validated root causes.",
+                "estimated_cost": "Low to medium: operational review time.",
+                "risk": "Low: do not infer individual customer causes from aggregate data.",
+                "confidence": 0.79,
+                "requires_approval": True,
+            }
+        )
+    if metrics["revenue_change_pct"] < 0:
+        recommendations.append(
+            {
+                "title": "Test a small merchant-approved payment-method offer",
+                "action": "Draft a time-bounded offer for a permitted payment method; publish only after approval.",
+                "expected_impact": "May improve conversion on selected payment methods; not a revenue guarantee.",
+                "estimated_cost": "Medium: offer funding subject to merchant margin review.",
+                "risk": "Medium: cap budget and measure incrementality before scaling.",
+                "confidence": 0.63,
+                "requires_approval": True,
+            }
+        )
+    if not recommendations:
+        recommendations.append(
+            {
+                "title": "Protect service level while testing one approved retention idea",
+                "action": "Create a small opt-in experiment draft and review results before expanding it.",
+                "expected_impact": "Potential incremental retention improvement; not guaranteed.",
+                "estimated_cost": "Low: limited pilot budget.",
+                "risk": "Low: require merchant approval and a defined stop condition.",
+                "confidence": 0.61,
+                "requires_approval": True,
+            }
+        )
+    return recommendations[:3]
+
+
+def recommend_merchant_growth(payload: dict[str, Any]) -> dict[str, Any]:
+    """Return the strict Merchant Growth contract from permitted business aggregates."""
+    merchant_id = clamp_text(payload.get("merchant_id"), 120)
+    record = MERCHANT_GROWTH_DATA.get(merchant_id)
+    guard = _untrusted_input_guard(payload)
+    quarantined = guard["decision"] in {"block", "review"}
+    if not record or not record["history_complete"]:
+        result = {
+            "merchant_id": merchant_id or "unknown",
+            "period": record["period"] if record else "unknown",
+            "summary": "INSUFFICIENT_EVIDENCE: required verified merchant history is missing or contradictory; escalated for data-quality review.",
+            "observed_metrics": record["metrics"] if record else {},
+            "recommendations": [],
+            "draft_campaigns": [],
+            "data_limitations": [
+                "Transaction, retention, settlement, or payment-method history is incomplete.",
+                "No forecast or campaign recommendation was produced from incomplete data.",
+            ] + (["Untrusted external text was quarantined and ignored."] if quarantined else []),
+        }
+    else:
+        metrics = record["metrics"]
+        forecast = round(metrics["revenue_inr"] * (1 + metrics["revenue_change_pct"] / 100), 0)
+        observed_metrics = dict(metrics)
+        observed_metrics["forecast_next_30_days_inr"] = {
+            "value": forecast,
+            "label": "Forecast, not observed fact",
+            "assumption": "Recent aggregate revenue trend remains directionally stable; no guarantee of growth.",
+        }
+        recommendations = _growth_recommendations(metrics)
+        result = {
+            "merchant_id": merchant_id,
+            "period": record["period"],
+            "summary": "Observed aggregate payment metrics are separated from the forecast and action assumptions. Recommendations are drafts only and require merchant approval.",
+            "observed_metrics": observed_metrics,
+            "recommendations": recommendations,
+            "draft_campaigns": [{"title": "Opt-in returning-customer reminder", "status": "DRAFT_ONLY - not published", "approval_required": True}],
+            "data_limitations": (["Untrusted external text was quarantined and ignored."] if quarantined else []),
+        }
+    append_audit(
+        {
+            "at": now_iso(),
+            "event": "merchant_growth_recommendation",
+            "merchant_ref": _masked_reference(merchant_id or "unknown"),
+            "recommendation_count": len(result["recommendations"]),
+            "data_limitations": len(result["data_limitations"]),
+        }
+    )
     return result
 
 
@@ -408,12 +598,10 @@ class AppHandler(SimpleHTTPRequestHandler):
         route = urlparse(self.path).path
         try:
             payload = self._read_json()
-            if route == "/api/merchant/run":
-                self._send_json(HTTPStatus.OK, run_merchant_agent(payload))
-            elif route == "/api/guard/analyze":
-                result = analyze_prompt_injection(clamp_text(payload.get("text"), 30_000))
-                result["audit_id"] = f"guard_{uuid.uuid4().hex[:10]}"
-                self._send_json(HTTPStatus.OK, result)
+            if route == "/api/fraud/investigate":
+                self._send_json(HTTPStatus.OK, investigate_fraud(payload))
+            elif route == "/api/growth/recommend":
+                self._send_json(HTTPStatus.OK, recommend_merchant_growth(payload))
             elif route == "/api/vision/predict":
                 self._send_json(HTTPStatus.OK, DigitPredictor.predict(payload.get("pixels")))
             else:
